@@ -44,7 +44,7 @@ def fetch_financial_data(ticker_entry, table, update_columns, update_ratios):
         }).T  # Transpose to make keys as row indices
 
         # Save all fields to CSV files
-        data.to_csv(f"logs/{company_name}_financial_data.csv")
+        # data.to_csv(f"logs/{company_name}_financial_data.csv")
 
         # Clear the table
         for row in table.get_children():
@@ -58,7 +58,7 @@ def fetch_financial_data(ticker_entry, table, update_columns, update_ratios):
         print("Data for Ratios:", data)
 
         # Calculate and update ratios
-        ratio_data = calculate_ratios(data)
+        ratio_data = calculate_ratios(data, company_name)
 
         # Debugging: Print calculated ratios to ensure correctness
         print("Calculated Ratios:", ratio_data)

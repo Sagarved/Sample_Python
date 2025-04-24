@@ -50,13 +50,13 @@ def update_ratios(periods, ratio_data):
         ratio_table.heading(col, text=col)
         ratio_table.column(col, width=150)
 
-#     # Clear the ratio table
-#     for row in ratio_table.get_children():
-#         ratio_table.delete(row)
+    # Clear the ratio table
+    for row in ratio_table.get_children():
+        ratio_table.delete(row)
 
-#     # Populate the ratio table with data
-#     for ratio, values in ratio_data.items():
-#         ratio_table.insert("", "end", values=[ratio] + list(values))
+    # Populate the ratio table with data
+    for ratio, values in ratio_data.iterrows():
+        ratio_table.insert("", "end", values=[ratio] + list(values.values))
 
 # Run the application
 root.mainloop()
