@@ -1,34 +1,24 @@
 import pandas as pd
 
-def calculate_ratios(data):
-    ratios = {}
-
+def calculate_ratios(data, company_name):
     try:
-        # Extract necessary data
-        current_assets = data.get("Current Assets", pd.Series())
-        current_liabilities = data.get("Current Liabilities", pd.Series())
-        inventory = data.get("Inventory", pd.Series())
-        total_assets = data.get("Total Assets", pd.Series())
-        total_liabilities = data.get("Total Liabilities Net Minority Interest", pd.Series())
-        total_revenue = data.get("Total Revenue", pd.Series())
-        cogs = data.get("Cost Of Revenue", pd.Series())
-        net_income = data.get("Net Income", pd.Series())
-        ebit = data.get("EBIT", pd.Series())
-        interest = data.get("Net Interest Income", pd.Series())
-        common_equity = data.get("Common Stock Equity", pd.Series())
-
-        # Calculate ratios for each period
-        ratios["Current Ratio"] = current_assets / current_liabilities
-        ratios["Quick Ratio"] = (current_assets - inventory) / current_liabilities
-        ratios["Total Asset Turnover"] = total_revenue / total_assets
-        ratios["Times Interest Earned"] = ebit / interest
-        ratios["Gross Profit Margin"] = (total_revenue - cogs) / total_revenue
-        ratios["Net Profit Margin"] = net_income / total_revenue
-        ratios["Return on Total Assets"] = net_income / total_assets
-        ratios["Return on Equity"] = net_income / common_equity
-        ratios["Financial Leverage Multiplier"] = total_assets / common_equity
-
+        # Calculate various financial ratios
+        ratios = {
+            "Current Ratio": data.loc["Current Assets"] / data.loc["Current Liabilities"],
+            "Quick Ratio": (data.loc["Current Assets"] - data.loc["Inventory"]) / data.loc["Current Liabilities"],
+            "Inventory Turnover": data.loc["Inventory Sales (Revenues)"] / data.loc["Inventory"],
+            "Total Assets Turnover": data.loc["Inventory Sales (Revenues)"] / data.loc["Total Assets"],
+            "Return on Assets": data.loc["Net Income"] / data.loc["Total Assets"],
+            "Return on Equity": data.loc["Net Income"] / data.loc["Common Equity"],
+            "Gross Profit Margin": (data.loc["EBIT"]) / data.loc["Inventory Sales (Revenues)"],
+            "Net Profit Margin": data.loc["Net Income"] / data.loc["Inventory Sales (Revenues)"],
+        }
+        # store the ratios in a csv file
+        ratios_df = pd.DataFrame(ratios)
+        ratios_df= ratios_df.T  # Transpose to make keys as row indices
+        ratios_df.to_csv(f"logs/{company_name}_ratios_from_rc.csv", index=True)
+        # Return the calculated ratios
+        return ratios
     except Exception as e:
-        print(f"Error calculating ratios: {e}")
-
-    return ratios
+        print(f"Error calculating ratios for {company_name}: {e}")
+        return {}
