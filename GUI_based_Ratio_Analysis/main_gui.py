@@ -21,24 +21,39 @@ def update_ratios(all_ratios):
         company_label = Label(company_frame, text=company, font=("Arial", 14, "bold"))
         company_label.pack(anchor="w", pady=(0, 10))
 
-        # Create a table for ratios
-        periods = list(next(iter(ratios.values())).keys())  # Extract periods (year and date)
-        table = ttk.Treeview(company_frame, columns=["Ratio"] + periods, show="headings")
-        table.pack(fill="x")
+        for period_type, period_ratios in ratios.items():
+            # Add period type (Annual/Quarterly) as a subtitle
+            period_label = Label(company_frame, text=f"{period_type.capitalize()} Ratios", font=("Arial", 12, "italic"))
+            period_label.pack(anchor="w", pady=(5, 5))
 
-        # Set column headings
-        table.heading("Ratio", text="Ratio")
-        table.column("Ratio", width=150, anchor="center")
-        for period in periods:
-            table.heading(period, text=period)
-            table.column(period, width=100, anchor="center")
+            # Ensure period_ratios keys are strings
+            period_ratios = {str(period): values for period, values in period_ratios.items()}
 
-        # Add rows for each ratio
-        for ratio_name, ratio_values in ratios.items():
-            row = [ratio_values.get(period, "N/A") for period in periods]
-            table.insert("", "end", values=[ratio_name] + row)
+            # Create a table for ratios
+            periods = list(period_ratios.keys())  # Extract periods (year and date)
+            table = ttk.Treeview(company_frame, columns=["Ratio"] + periods, show="headings")
+            table.pack(fill="x")
 
-       
+            # Set column headings
+            table.heading("Ratio", text="Ratio")
+            table.column("Ratio", width=150, anchor="center")
+            for period in periods:
+                table.heading(period, text=period)
+                table.column(period, width=100, anchor="center")
+
+            # Add rows for each ratio
+            for ratio_name in next(iter(period_ratios.values())).keys():
+                row = [period_ratios[period].get(ratio_name, "N/A") for period in periods]
+                table.insert("", "end", values=[ratio_name] + row)
+
+            # Save ratios to CSV file
+            os.makedirs("logs", exist_ok=True)
+            csv_file = os.path.join("logs", f"{company}_{period_type}_ratios.csv")
+            with open(csv_file, "w") as f:
+                f.write(",".join(["Ratio"] + periods) + "\n")
+                for ratio_name in next(iter(period_ratios.values())).keys():
+                    f.write(",".join([ratio_name] + [str(period_ratios[period].get(ratio_name, "N/A")) for period in periods]) + "\n")
+
 # Initialize the main GUI window
 root = Tk()
 root.title("Financial Ratio Analysis")
